@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta charset="utf8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./bg-bubbles.css">
+
+    <title>Document</title>
+</head>
+
+<body
+    style="-webkit-app-region: drag;width: 100px;height: 834px;background-color: transparent;overflow: hidden;">
+    <ul class="bg-bubbles" style="">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+    
+    <div class="container" style="opacity: 0;width: 100%;height: 834px;position: absolute;left: -500px;top: 0px;transition: .5s ease-in-out">
+        <header class="topbar"
+            style="width: 100%;height: 15%;background-color: rgb(4, 181, 207)"
+        >
+            <div class="control"
+                style="z-index: 1;user-select: none;transition: 0.3s ease-in-out;position: absolute;right: -80%;top: -95%;bottom: 0px;left: 0px;width: 60px;height: 30px;margin: auto;z-index: 5;">
+                <ul style="display: flex;justify-content: space-between;list-style: none;padding: 0px;margin: 0px;">
+                    <li id="min_scale"
+                        style="border-radius: 50%;overflow: hidden;width: 20px;height: 20px;background-image: url(./../LoginPage/max_close_min.png);background-position: -63.5px ;background-size: 730%">
+                    </li>
+                    <li id="close_client"
+                        style="border-radius: 50%;overflow: hidden;width: 20px;height: 20px;background-image: url(./../LoginPage/max_close_min.png);background-position: -31px ;background-size: 730%">
+                    </li>
+                </ul>
+            </div>
+            <div class="user_info">
+
+            </div>
+        </header>
+        <div class="_user" style="height: 70%;background-color: transparent;display: flex;">
+            
+        </div>
+    </div>
+    <!-- 4,181,207 -->
+    
+</body>
+<script type="text/javascript">
+    const { ipcRenderer } = require("electron");
+    let clientObject = {
+        _$: function(arg, isMutiple = false){
+            return isMutiple ? document.querySelectorAll(arg):document.querySelector(arg);
+        },
+        _init: function(_$ = this._$, data){
+            _$("li#min_scale").onclick = function(){
+                ipcRenderer.sendSync("minimize-user-client");
+            };
+            _$("li#close_client").onclick = function(){
+                ipcRenderer.sendSync("close-user-client");
+            };
+        },
+        /**
+         * @function 用户信息渲染
+         * @param {_$(select), _user_data: {  q_graph,id, q_acc, q_friend_id, q_group_id, q_img, q_md5_pass, q_pass, q_name, q_socket_id }}
+         */
+
+        _user_render: function(_user_data,_$ = this._$){
+            console.log(_user_data);
+            const { q_img, q_name, q_graph } = _user_data,
+                   inner = ` <span style="text-align: center;line-height: 78px;overflow: hidden;display: inline-block;width: 78px;height: 78px;border-radius: 50%">
+                        ${
+                            q_img ?'<img src=${q_img} alt="">': "<a id='up_headimg'>点击此处上传头像</a>"
+                        }
+                    </span>
+                    <p style='line-height: 40px'>
+                        <span>${q_name}</span>
+                        <span>${q_graph}</span>
+                    </p>`;
+            _$("div.user_info").innerHTML = inner;
+        }
+    }
+    ipcRenderer.send("get-user-data");
+    ipcRenderer.on("user-data-response", (event, arg) => {
+        console.log(arg);
+        clientObject._user_render(arg);
+
+        setTimeout(x=>{
+            clientObject._$("div.container").style.left = 0;
+            clientObject._$("div.container").style.opacity = 1;
+        }, 300)
+    })
+
+
+
+    // document.body.onmousedown = function(){
+    //     let response = ipcRenderer.sendSync("user-client-drag");
+    //     console.log(response);
+    //     this.onmousemove = function(){
+    //         let now_pos = ipcRenderer.sendSync("user-client-drag");
+    //     }
+    //     this.onmouseup = x=> this.onmousemove = null;
+    // }
+</script>
+
+</html>
