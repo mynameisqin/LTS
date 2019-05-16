@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<!-- saved from url=(0065)http://www.17sucai.com/preview/1528155/2019-03-07/sign/index.html -->
+<html lang="en">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+	<title>#026 - Double slider Sign in/up Form - Desktop Only</title>
+
+	<!--图标样式-->
+	<link rel="stylesheet" href="./all.min.css">
+
+	<link rel="stylesheet" href="./style.css">
+
+	<link rel="stylesheet" href="./bg-bubbles.css">
+	<style>
+
+	</style>
+</head>
+
+<body style="overflow: hidden;background-color: transparent;transition: .5s ease-in-out;">
+
+	<div class="out"
+		style='
+		background-color: transparent;
+		background-image: url(./bg.gif);
+		background-size: cover;
+		transition: .5s ease-in-out;
+		border-radius: 5px;perspective: 800px; transform-style: preserve-3d;height: 480px;  position: absolute;left: 0px;top:0px;right: 0px;bottom: 0px;margin: auto;width: 384px;display: block;z-index: unset;opacity: 1;transform: rotateY(0deg); transition: .6s ease-in-out;'>
+		<div class="control"
+			style="user-select: none;transition: 0.3s ease-in-out;position: absolute;right: -70%;top: -85%;bottom: 0px;left: 0px;width: 60px;height: 30px;margin: auto;z-index: 5;">
+			<ul style="display: flex;justify-content: space-between;list-style: none;padding: 0px;margin: 0px;">
+				<li id="min_scale"
+					style="border-radius: 50%;overflow: hidden;width: 20px;height: 20px;background-image: url(./max_close_min.png);background-position: -63.5px ;background-size: 730%">
+				</li>
+				<li id="close_sign"
+					style="border-radius: 50%;overflow: hidden;width: 20px;height: 20px;background-image: url(./max_close_min.png);background-position: -31px ;background-size: 730%">
+				</li>
+			</ul>
+		</div>
+		<!-- <ul class="bg-bubbles">
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+		</ul> -->
+		<div class="form-container sign-in-container"
+			style="
+		background-color: transparent;color: #fff;border-radius: 5px;height: 480px; position: absolute;left: 0px;top:0px;right: 0px;bottom: 0px;margin: auto;width: 384px;display: block;transform: translateZ(1px);">
+			<div
+				style="position: absolute;left: 0px;bottom: -20px;animation-name: square;animation-duration: 25s;animation-iteration-count: infinite;">
+			</div>
+			<form action="javascript:;" style="background-color: transparent">
+				<h1 style="color: white;user-select: none;">登录</h1>
+				<div class="social-container">
+				</div>
+				<input style="-webkit-app-region: no-drag;" class="input_acc" type="text" placeholder="账号">
+				<input style="-webkit-app-region: no-drag;" class="input_pass" type="password" placeholder="密码">
+				<div style="display: flex;width: 100%;justify-content: space-between">
+					<a style="-webkit-app-region: no-drag;user-select: none;color: #fff;display: inline;margin: 0px;padding: 0px;"
+						href="javascript:;">忘记密码？</a>
+					<a style="-webkit-app-region: no-drag;user-select: none;color: #fff;display: inline;margin: 0px;padding: 0px;"
+						href="javascript:;" id="texe">log日志</a>
+					<a style="-webkit-app-region: no-drag;user-select: none;color: #fff;display: inline;margin: 0px;padding: 0px;"
+						href="javascript:;" id="toreg">注册账号</a>
+				</div>
+				<button id="sign" style="margin-top: 30px;-webkit-app-region: no-drag">登录</button>
+			</form>
+		</div>
+	</div>
+
+	<script>
+		const { ipcRenderer } = require("electron");
+		class main {
+			constructor() {
+
+
+				this.toReg = this.el("a#toreg");
+				this.sign = this.el("button#sign");
+
+				this.toSign = this.el("a#tosign");
+				this.reg = this.el("button#register");
+
+				this.wrapper = this.el("div.out");
+
+				this.regC = this.el(".sign-in-container");
+
+				this.ch = this.el("#texe");
+
+				this._close = this.el("#close_sign");
+				this._min = this.el("#min_scale");
+
+				this._acc = this.el("input.input_acc");
+				this._pass = this.el("input.input_pass");
+				this.init();
+			}
+			el(arg) {
+				let doms = document.querySelectorAll(arg);
+				return doms.length > 1 ? doms : document.querySelector(arg);
+			}
+
+			zIndexChange(n) {
+				let n2 = n ? 0 : 1;
+				this.regC.style.zIndex = n2;
+
+				this.el(".control").style.opacity = 0;
+				setTimeout(x => this.el(".control").style.opacity = 1, 300);
+			}
+			init(e = this.Events.bind(this), d = this.D.bind(this)) {
+				e("toReg", x => {
+					ipcRenderer.sendSync("register-browser");
+				}, "onclick")
+
+				e("ch", x => {
+					ipcRenderer.sendSync("open-the-exe-log");
+				})
+
+				e("_close", x => {
+					ipcRenderer.sendSync("close-sign");
+				})
+
+				e("_min", x => {
+					ipcRenderer.sendSync("min-scale");
+				})
+
+				e("_acc", e => {
+					e.stopPropagation();
+				}, "onmousedown")
+				e("_pass", e => {
+					e.stopPropagation();
+				}, "onmousedown")
+
+				e("sign", x => {
+					let body = new FormData();
+					body.append("acc", this.el(".input_acc").value);
+					body.append("p", this.el(".input_pass").value);
+					fetch("http://localhost:80/qq/main.php/qq_user/qq_sign", {
+						method: "post",
+						body
+					}).then(res => res.json()).then(res => {
+						if (res.code) {
+							this.el("div.out").style.left = "384px";
+							this.el("div.out").style.opacity = 0;
+							setTimeout(x => {
+								ipcRenderer.sendSync("user-data-storage", res.data);
+							}, 700)
+						}
+					})
+				})
+			}
+
+			D(key) {
+				return this[key];
+			}
+
+			Events(arg, fn, event = "onclick") {
+				this[arg][event] = fn
+			}
+			/*
+				@Function ipcRenderer发送
+				@Author qxt
+				@return true/false/null
+			*/
+
+
+		}
+		let _main_ = new main();
+		document.body.onmousedown = function (e) {
+			let { clientX ,clientY } = e;
+			this.onmousemove = function () {
+				ipcRenderer.sendSync("change-brower-window-screen", { x: clientX, y: clientY });
+			}
+			this.onmouseup = function () {
+				this.onmousemove = null;
+			}
+		}
+	</script>
+</body>
+
+</html>

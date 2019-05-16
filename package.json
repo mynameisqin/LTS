@@ -1,0 +1,8 @@
+{
+	"name": "qq",
+	"main": "main.js",
+	"version": "0.0.1",
+	"scripts":{
+		"start": "electron ."
+	}
+}
